@@ -1,18 +1,100 @@
-<h2>Colaboradores</h2>
-<table id="tabela-colaboradores">
-  <thead>
-    <tr>
-      <th>Nome</th>
-      <th>Email</th>
-      <th>Telefone</th>
-      <th>Turma</th>
-      <th>Sala</th>
-      <th>Data</th>
-      <th>Horário</th>
-      <th>Foto</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Os dados dos colaboradores serão inseridos aqui via JavaScript -->
-  </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Criar Colaborador</title>
+  <link rel="stylesheet" href="colaboradores.css">
+
+</head>
+<body>
+ 
+  <h2>Lista de Colaboradores</h2>
+  <table id="tabela-colaboradores" border="1" cellpadding="10" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Foto</th>
+        <th>Primeiro Nome</th>
+        <th>Último Nome</th>
+        <th>Contato</th>
+        <th>Email</th>
+        <th>Usuário</th>
+        <th>Senha</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dados serão inseridos aqui via JavaScript -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', carregarColaboradores);
+
+  async function carregarColaboradores() {
+    try {
+      const response = await fetch('/api/colaboradores');
+      const colaboradores = await response.json();
+      const tabela = document.querySelector('#tabela-colaboradores tbody');
+      if (!tabela) return;
+
+      tabela.innerHTML = '';
+
+      colaboradores.forEach(colab => {
+        const row = tabela.insertRow();
+
+        const cellFoto = row.insertCell();
+        if (colab.foto) {
+          const img = document.createElement('img');
+          img.src = colab.foto;
+          img.alt = 'Foto';
+          img.width = 50;
+          cellFoto.appendChild(img);
+        } else {
+          cellFoto.textContent = 'Sem foto';
+        }
+
+        row.insertCell().textContent = colab.primeiro_nome;
+        row.insertCell().textContent = colab.ultimo_nome;
+        row.insertCell().textContent = colab.numero_contato;
+        row.insertCell().textContent = colab.email;
+        row.insertCell().textContent = colab.nome_usuario;
+        row.insertCell().textContent = colab.senha;
+
+        const cellAcoes = row.insertCell();
+        const btnEditar = document.createElement('button');
+        btnEditar.textContent = 'Editar';
+        btnEditar.onclick = () => alert(`Editar ${colab.nome_usuario}`);
+
+        const btnExcluir = document.createElement('button');
+        btnExcluir.textContent = 'Excluir';
+        btnExcluir.onclick = () => excluirColaborador(colab.id);
+
+        cellAcoes.appendChild(btnEditar);
+        cellAcoes.appendChild(btnExcluir);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar colaboradores:', error);
+    }
+  }
+
+  function excluirColaborador(id) {
+    if (confirm('Tem certeza que deseja excluir este colaborador?')) {
+      fetch(`/api/colaboradores/${id}`, {
+        method: 'DELETE'
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || 'Colaborador excluído!');
+          carregarColaboradores();
+        })
+        .catch(err => {
+          console.error('Erro ao excluir:', err);
+        });
+    }
+  }
+</script>
+
+</body>
+</html>

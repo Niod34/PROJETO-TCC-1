@@ -3,8 +3,8 @@ const mysql = require('mysql2');
 const connection = mysql.createConnection({
   host: 'localhost', // Endereço do banco de dados
   user: 'root', // Usuário do MySQL
-  password: '', // Senha do MySQL
-  database: 'colaboradores_db' // Nome do banco de dados
+  password: 'Antetokounmpo34!', // Senha do MySQL
+  database: 'empresa' // Nome do banco de dados
 });
 
 connection.connect((err) => {

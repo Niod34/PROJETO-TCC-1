@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Colaborador</title>
-    <link rel="stylesheet" href="criar-colaborador.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Criar Colaborador</title>
+  <link rel="stylesheet" href="criar-colaborador.css">
+ 
+ 
 </head>
 <body>
 
@@ -49,6 +51,7 @@
               <div class="photo-upload-box">
                 <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
                 <span id="file-name">Nenhum arquivo escolhido</span>
+                <img id="preview" class="preview-img" />
               </div>
             </div>
 
@@ -60,21 +63,45 @@
   </div>
 
   <script>
-    document.getElementById("registration-form").addEventListener("submit", function(e) {
-        e.preventDefault();
+    const fileInput = document.getElementById("profile-picture");
+    const fileNameDisplay = document.getElementById("file-name");
+    const previewImg = document.getElementById("preview");
 
-        const formData = new FormData(this);
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        fileNameDisplay.textContent = file.name;
 
-        fetch("http://localhost:3000/api/criar-colaborador", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.text())
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImg.src = e.target.result;
+          previewImg.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        fileNameDisplay.textContent = "Nenhum arquivo escolhido";
+        previewImg.style.display = "none";
+      }
+    });
+
+    document.getElementById("registration-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+
+      fetch("http://localhost:3000/api/criar-colaborador", {
+        method: "POST",
+        body: formData,
+      })
+        .then(response => response.json())
         .then(data => {
-            alert(data);
+          alert(data.message || "Colaborador registrado!");
+          this.reset();
+          previewImg.style.display = "none";
+          fileNameDisplay.textContent = "Nenhum arquivo escolhido";
         })
         .catch(error => {
-            console.error("Erro ao registrar colaborador:", error);
+          console.error("Erro ao registrar colaborador:", error);
         });
     });
   </script>
